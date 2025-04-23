@@ -11,21 +11,23 @@ import (
 )
 
 type StructAnalyzer struct {
-	StructType *ast.StructType
+	fset *token.FileSet
+	st   *ast.StructType
+
+	cg map[int]*ast.CommentGroup
 }
 
-func New(st *ast.StructType) StructAnalyzer {
+func New(fset *token.FileSet, st *ast.StructType) StructAnalyzer {
 	return StructAnalyzer{
-		StructType: st,
+		fset: fset,
+		st:   st,
+
+		cg: make(map[int]*ast.CommentGroup),
 	}
 }
 
-func (s *StructAnalyzer) CheckNode(node ast.Node) {
-
-}
-
 //nolint:nestif // refactor later
-func (s *StructAnalyzer) Analyze(fset *token.FileSet) (analysis.Diagnostic, bool) {
+func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 	if !s.IsAnalyzingStruct() {
 		return analysis.Diagnostic{}, false
 	}
@@ -33,7 +35,7 @@ func (s *StructAnalyzer) Analyze(fset *token.FileSet) (analysis.Diagnostic, bool
 	var lastEmbeddedField *ast.Field
 	var firstNotEmbeddedField *ast.Field
 
-	for _, field := range s.StructType.Fields.List {
+	for _, field := range s.st.Fields.List {
 		if astutils.IsFieldEmbedded(field) {
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
@@ -51,10 +53,14 @@ func (s *StructAnalyzer) Analyze(fset *token.FileSet) (analysis.Diagnostic, bool
 		}
 	}
 
-	// check for missing space
+	// check for missing space (TODO: isn't it easy to remove as many lines as comments between last embededed type and first not embedded)
 	if lastEmbeddedField != nil && firstNotEmbeddedField != nil {
-		line := fset.Position(lastEmbeddedField.End()).Line
-		nextLine := fset.Position(firstNotEmbeddedField.Pos()).Line
+		line := s.fset.Position(lastEmbeddedField.End()).Line
+
+		nextLine := s.fset.Position(firstNotEmbeddedField.Pos()).Line
+		if cg, ok := s.cg[nextLine-1]; ok {
+			nextLine = s.fset.Position(cg.Pos()).Line
+		}
 		if nextLine != line+2 {
 			return diag.NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField, firstNotEmbeddedField), true
 		}
@@ -62,10 +68,15 @@ func (s *StructAnalyzer) Analyze(fset *token.FileSet) (analysis.Diagnostic, bool
 	return analysis.Diagnostic{}, false
 }
 
+func (s *StructAnalyzer) CheckCommentGroup(node *ast.CommentGroup) {
+	lineEnd := s.fset.Position(node.End()).Line
+	s.cg[lineEnd] = node
+}
+
 func (s *StructAnalyzer) IsAnalyzingStruct() bool {
-	return s.StructType != nil
+	return s.st != nil
 }
 
 func (s *StructAnalyzer) GetEndPos() token.Pos {
-	return s.StructType.End()
+	return s.st.End()
 }

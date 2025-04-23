@@ -15,6 +15,10 @@ func TestAnalyzer(t *testing.T) {
 			desc:     "default",
 			patterns: "simple",
 		},
+		{
+			desc:     "comments",
+			patterns: "comments",
+		},
 	}
 
 	for _, test := range testCases {

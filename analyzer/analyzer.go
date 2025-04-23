@@ -32,18 +32,18 @@ func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
 		ast.Inspect(file, func(n ast.Node) bool {
 			switch node := n.(type) {
 			case *ast.StructType:
-				if diag, ok := a.Analyze(fset); ok {
+				if diag, ok := a.Analyze(); ok {
 					pass.Report(diag)
 				}
-				a = structanalyzer.New(node)
-			default:
-				if a.IsAnalyzingStruct() && node != nil && node.End() <= a.GetEndPos() {
-					a.CheckNode(n)
+				a = structanalyzer.New(fset, node)
+			case *ast.CommentGroup:
+				if a.IsAnalyzingStruct() && node.End() <= a.GetEndPos() {
+					a.CheckCommentGroup(node)
 				}
 			}
 			return true
 		})
-		if diag, ok := a.Analyze(fset); ok {
+		if diag, ok := a.Analyze(); ok {
 			pass.Report(diag)
 		}
 	}
