@@ -1,6 +1,9 @@
 package simple
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type ValidStruct struct {
 	time.Time
@@ -9,12 +12,27 @@ type ValidStruct struct {
 }
 
 type NoSpaceStruct struct {
-	time.Time // want `missing space`
+	time.Time // want `there must be an empty line separating embedded fields from regular fields`
 	version   int
 }
 
 type NotSortedStruct struct {
 	version int
 
-	time.Time // want `missing space`
+	time.Time // want `embedded types should be listed before non embedded types`
+}
+
+type MixedEmbeddedAndNotEmbedded struct {
+	context.Context
+
+	name string
+
+	time.Time // want `embedded types should be listed before non embedded types`
+
+	age int
+}
+
+type EmbeddedWithPointers struct {
+	*time.Time // want `there must be an empty line separating embedded fields from regular fields`
+	version    int
 }

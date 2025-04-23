@@ -15,10 +15,6 @@ func TestAnalyzer(t *testing.T) {
 			desc:     "default",
 			patterns: "simple",
 		},
-		{
-			desc:     "default",
-			patterns: "missingspace",
-		},
 	}
 
 	for _, test := range testCases {

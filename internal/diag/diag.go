@@ -12,3 +12,10 @@ func NewEmbeddedTypeAfterNotEmbeddedTypeDiag(embeddedField *ast.Field) analysis.
 		Message: "embedded types should be listed before non embedded types",
 	}
 }
+
+func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField *ast.Field, firstNotEmbeddedType *ast.Field) analysis.Diagnostic {
+	return analysis.Diagnostic{
+		Pos:     lastEmbeddedField.Pos(),
+		Message: "there must be an empty line separating embedded fields from regular fields",
+	}
+}

@@ -1,13 +1,17 @@
 package astutils
 
 import (
-	"github.com/manuelarte/embeddedcheck/internal/diag"
 	"go/ast"
 )
 
-func HasEmbeddedTypes(n *ast.TypeSpec) bool {
-	for _, field := range n.Fields.List {
-		if len(field.Names) == 0 {
+func IsFieldEmbedded(field *ast.Field) bool {
+	return len(field.Names) == 0
+}
+
+func HasEmbeddedTypes(n *ast.StructType) bool {
+	return true
+	/*for _, field := range n.Fields.Fields.List {
+		if len(field.Names) == 0
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
 			}
@@ -19,5 +23,5 @@ func HasEmbeddedTypes(n *ast.TypeSpec) bool {
 				firstNotEmbeddedField = field
 			}
 		}
-	}
+	}*/
 }

@@ -5,7 +5,6 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
-	"golang.org/x/tools/go/ast/inspector"
 
 	"github.com/manuelarte/embeddedcheck/internal/structanalyzer"
 )
@@ -27,46 +26,28 @@ func NewAnalyzer() *analysis.Analyzer {
 type embeddedcheck struct{}
 
 func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
-	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
-	if !found {
-		//nolint:nilnil // impossible case.
-		return nil, nil
-	}
-
-	nodeFilter := []ast.Node{
-		(*ast.TypeSpec)(nil),
-		(*ast.StructType)(nil),
-		(*ast.Ident)(nil),
-		(*ast.Field)(nil),
-	}
-
-	a := structanalyzer.New()
-
+	fset := pass.Fset
 	for _, file := range pass.Files {
+		var a structanalyzer.StructAnalyzer
 		ast.Inspect(file, func(n ast.Node) bool {
-			if node, isStruct := n.(*ast.TypeSpec); isStruct {
-				if diag, isNotValid := a.Analyze(node); isNotValid {
+			switch node := n.(type) {
+			case *ast.StructType:
+				if diag, ok := a.Analyze(fset); ok {
 					pass.Report(diag)
-					return false
 				}
-				if utils.HasEmbeddedTypes(node) {
-					// now check the fields and the empty line
-				} else {
-					return false
+				a = structanalyzer.New(node)
+			default:
+				if a.IsAnalyzingStruct() && node != nil && node.End() <= a.GetEndPos() {
+					a.CheckNode(n)
 				}
-
 			}
 			return true
 		})
+		if diag, ok := a.Analyze(fset); ok {
+			pass.Report(diag)
+		}
 	}
 
-	insp.Preorder(nodeFilter, func(n ast.Node) {
-		if node, isStruct := n.(*ast.TypeSpec); isStruct {
-			if diag, isNotValid := a.Analyze(node); isNotValid {
-				pass.Report(diag)
-			}
-		}
-	})
 	//nolint:nilnil //any, error
 	return nil, nil
 }
