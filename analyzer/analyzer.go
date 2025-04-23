@@ -1,12 +1,13 @@
 package analyzer
 
 import (
-	"github.com/manuelarte/embeddedcheck/internal"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
+
+	"github.com/manuelarte/embeddedcheck/internal"
 )
 
 func NewAnalyzer() *analysis.Analyzer {
@@ -39,9 +40,8 @@ func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
 	a := internal.NewStructAnalyzer()
 
 	insp.Preorder(nodeFilter, func(n ast.Node) {
-		switch node := n.(type) {
-		case *ast.TypeSpec:
-			if diag, ok := a.Analyze(node); ok {
+		if node, isStruct := n.(*ast.TypeSpec); isStruct {
+			if diag, isNotValid := a.Analyze(node); isNotValid {
 				pass.Report(diag)
 			}
 		}
