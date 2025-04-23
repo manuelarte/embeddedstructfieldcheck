@@ -16,5 +16,5 @@ type NoSpaceStruct struct {
 type NotSortedStruct struct {
 	version int
 
-	time.Time // want `should be declared before 17`
+	time.Time // want `missing space`
 }

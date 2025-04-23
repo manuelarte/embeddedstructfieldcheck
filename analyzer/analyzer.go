@@ -7,7 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 
-	"github.com/manuelarte/embeddedcheck/internal"
+	"github.com/manuelarte/embeddedcheck/internal/structanalyzer"
 )
 
 func NewAnalyzer() *analysis.Analyzer {
@@ -35,9 +35,30 @@ func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
 
 	nodeFilter := []ast.Node{
 		(*ast.TypeSpec)(nil),
+		(*ast.StructType)(nil),
+		(*ast.Ident)(nil),
+		(*ast.Field)(nil),
 	}
 
-	a := internal.NewStructAnalyzer()
+	a := structanalyzer.New()
+
+	for _, file := range pass.Files {
+		ast.Inspect(file, func(n ast.Node) bool {
+			if node, isStruct := n.(*ast.TypeSpec); isStruct {
+				if diag, isNotValid := a.Analyze(node); isNotValid {
+					pass.Report(diag)
+					return false
+				}
+				if utils.HasEmbeddedTypes(node) {
+					// now check the fields and the empty line
+				} else {
+					return false
+				}
+
+			}
+			return true
+		})
+	}
 
 	insp.Preorder(nodeFilter, func(n ast.Node) {
 		if node, isStruct := n.(*ast.TypeSpec); isStruct {
@@ -46,7 +67,6 @@ func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
 			}
 		}
 	})
-
 	//nolint:nilnil //any, error
 	return nil, nil
 }

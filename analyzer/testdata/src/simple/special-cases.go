@@ -5,6 +5,6 @@ import "time"
 func myFunction() {
 	type myType struct {
 		version   int
-		time.Time // want `should be declared before line 7`
+		time.Time // want `embedded types should be listed before non embedded types`
 	}
 }
