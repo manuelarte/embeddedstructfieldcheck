@@ -1,0 +1,11 @@
+{
+  "line-length": {
+    "line_length": 120,
+    "code_blocks": false
+  },
+  "MD033": {
+    "allowed_elements": [
+      "table", "thead", "tbody", "tr", "td", "th"
+    ]
+  }
+}

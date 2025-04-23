@@ -2,7 +2,8 @@
 
 [![Go](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/xxxx/actions/workflows/go.yml)
 
-Linter that checks that embedded types should be at the top of the field list of a struct, and there must be an empty line separating embedded fields from regular fields.
+Linter that checks that embedded types should be at the top of the field list of a struct.
+And there must be an empty line separating embedded fields from regular fields.
 
 <table>
 <thead><tr><th>❌ Bad</th><th>✅ Good</th></tr></thead>
@@ -33,16 +34,12 @@ type Client struct {
 
 ## ⬇️  Getting Started
 
-Explain how to install it
+Install it by running:
 
 ```bash
 go install github.com/manuelarte/embeddedcheck@latest
 ```
 
-## 🚀 Features
-
-Explain features
-
 ## Resources
 
-- <https://github.com/uber-go/guide/blob/master/style.md#embedding-in-structs>
+- [Embedding in structs](https://github.com/uber-go/guide/blob/master/style.md#embedding-in-structs)
