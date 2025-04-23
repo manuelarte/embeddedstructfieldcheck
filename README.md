@@ -1,6 +1,6 @@
 # Go Template
 
-[![Go](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/xxxx/actions/workflows/go.yml)
+[![Go](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml)
 
 Linter that checks that embedded types should be at the top of the field list of a struct.
 And there must be an empty line separating embedded fields from regular fields.
