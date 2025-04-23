@@ -1,12 +1,12 @@
 package structanalyzer
 
 import (
-	"github.com/manuelarte/embeddedcheck/internal/astutils"
 	"go/ast"
 	"go/token"
 
 	"golang.org/x/tools/go/analysis"
 
+	"github.com/manuelarte/embeddedcheck/internal/astutils"
 	"github.com/manuelarte/embeddedcheck/internal/diag"
 )
 
