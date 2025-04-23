@@ -46,16 +46,14 @@ func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 			if firstNotEmbeddedField != nil && firstNotEmbeddedField.Pos() < field.Pos() {
 				return diag.NewEmbeddedTypeAfterNotEmbeddedTypeDiag(field), true
 			}
-		} else {
-			if firstNotEmbeddedField == nil {
-				firstNotEmbeddedField = field
-			}
+		} else if firstNotEmbeddedField == nil {
+			firstNotEmbeddedField = field
 		}
 	}
 
 	if lastEmbeddedField != nil && firstNotEmbeddedField != nil {
-		if diag, ok := s.checkMissingSpace(lastEmbeddedField, firstNotEmbeddedField); ok {
-			return diag, true
+		if d, ok := s.checkMissingSpace(lastEmbeddedField, firstNotEmbeddedField); ok {
+			return d, true
 		}
 	}
 	return analysis.Diagnostic{}, false
@@ -75,7 +73,8 @@ func (s *StructAnalyzer) GetEndPos() token.Pos {
 }
 
 func (s *StructAnalyzer) checkMissingSpace(lastEmbeddedField *ast.Field, firstNotEmbeddedField *ast.Field) (analysis.Diagnostic, bool) {
-	// check for missing space (TODO: isn't it easy to remove as many lines as comments between last embededed type and first not embedded)
+	// check for missing space
+	// TODO: isn't it easy to remove as many lines as comments between last embededed type and first not embedded
 	line := s.fset.Position(lastEmbeddedField.End()).Line
 
 	nextLine := s.fset.Position(firstNotEmbeddedField.Pos()).Line
@@ -83,7 +82,7 @@ func (s *StructAnalyzer) checkMissingSpace(lastEmbeddedField *ast.Field, firstNo
 		nextLine = s.fset.Position(cg.Pos()).Line
 	}
 	if nextLine != line+2 {
-		return diag.NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField, firstNotEmbeddedField), true
+		return diag.NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField), true
 	}
 	return analysis.Diagnostic{}, false
 }
