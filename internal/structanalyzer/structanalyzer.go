@@ -26,7 +26,6 @@ func New(fset *token.FileSet, st *ast.StructType) StructAnalyzer {
 	}
 }
 
-//nolint:nestif // refactor later
 func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 	if !s.IsAnalyzingStruct() {
 		return analysis.Diagnostic{}, false
@@ -72,7 +71,10 @@ func (s *StructAnalyzer) GetEndPos() token.Pos {
 	return s.st.End()
 }
 
-func (s *StructAnalyzer) checkMissingSpace(lastEmbeddedField *ast.Field, firstNotEmbeddedField *ast.Field) (analysis.Diagnostic, bool) {
+func (s *StructAnalyzer) checkMissingSpace(
+	lastEmbeddedField *ast.Field,
+	firstNotEmbeddedField *ast.Field,
+) (analysis.Diagnostic, bool) {
 	// check for missing space
 	// TODO: isn't it easy to remove as many lines as comments between last embededed type and first not embedded
 	line := s.fset.Position(lastEmbeddedField.End()).Line

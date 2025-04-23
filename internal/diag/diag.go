@@ -13,7 +13,8 @@ func NewEmbeddedTypeAfterNotEmbeddedTypeDiag(embeddedField *ast.Field) analysis.
 	}
 }
 
-func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField *ast.Field) analysis.Diagnostic {
+func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(
+	lastEmbeddedField *ast.Field) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos:     lastEmbeddedField.Pos(),
 		Message: "there must be an empty line separating embedded fields from regular fields",
