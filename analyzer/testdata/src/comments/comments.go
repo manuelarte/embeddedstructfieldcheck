@@ -24,3 +24,11 @@ type StructWithMultiLineComments struct {
 	// very long comment
 	version int
 }
+
+type A struct {
+	// comment
+	ValidStructWithSingleLineComments
+	// C is foo
+	StructWithSingleLineComments // want `there must be an empty line separating embedded fields from regular fields`
+	D                            string
+}

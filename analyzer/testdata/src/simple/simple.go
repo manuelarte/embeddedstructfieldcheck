@@ -36,3 +36,16 @@ type EmbeddedWithPointers struct {
 	*time.Time // want `there must be an empty line separating embedded fields from regular fields`
 	version    int
 }
+
+type ValidStructWithTags struct {
+	EmbeddedWithPointers        `json:"foo"`
+	MixedEmbeddedAndNotEmbedded `json:"bar"`
+
+	D string
+}
+
+type StructWithTagsNoSpace struct {
+	EmbeddedWithPointers        `json:"foo"`
+	MixedEmbeddedAndNotEmbedded `json:"bar"` // want `there must be an empty line separating embedded fields from regular fields`
+	D                           string
+}
