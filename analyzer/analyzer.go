@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"go/ast"
+	"golang.org/x/tools/go/ast/inspector"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -27,25 +28,36 @@ type embeddedcheck struct{}
 
 func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
 	fset := pass.Fset
-	for _, file := range pass.Files {
-		var a structanalyzer.StructAnalyzer
-		ast.Inspect(file, func(n ast.Node) bool {
-			switch node := n.(type) {
-			case *ast.StructType:
-				if diag, ok := a.Analyze(); ok {
-					pass.Report(diag)
-				}
-				a = structanalyzer.New(fset, node)
-			case *ast.CommentGroup:
-				if a.IsAnalyzingStruct() && node.End() <= a.GetEndPos() {
-					a.CheckCommentGroup(node)
-				}
+
+	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
+	if !found {
+		//nolint:nilnil // impossible case.
+		return nil, nil
+	}
+
+	nodeFilter := []ast.Node{
+		(*ast.StructType)(nil),
+		(*ast.CommentGroup)(nil),
+	}
+
+	var a structanalyzer.StructAnalyzer
+	insp.Preorder(nodeFilter, func(n ast.Node) {
+		switch node := n.(type) {
+		case *ast.StructType:
+			if diag, ok := a.Analyze(); ok {
+				pass.Report(diag)
 			}
-			return true
-		})
-		if diag, ok := a.Analyze(); ok {
-			pass.Report(diag)
+			a = structanalyzer.New(fset, node)
+		case *ast.CommentGroup:
+			if a.IsAnalyzingStruct() && node.End() <= a.GetEndPos() {
+				a.CheckCommentGroup(node)
+			}
 		}
+	},
+	)
+
+	if diag, ok := a.Analyze(); ok {
+		pass.Report(diag)
 	}
 
 	//nolint:nilnil //any, error
