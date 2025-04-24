@@ -1,4 +1,4 @@
-# Go Template
+# EmbeddedCheck
 
 [![Go](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/manuelarte/embeddedcheck)](https://goreportcard.com/report/github.com/manuelarte/embeddedcheck)
