@@ -34,7 +34,7 @@ linters:
     - gomodguard
     - gosmopolitan
     - grouper
-    - imports
+    - importas
     - inamedparam
     - ireturn
     - maintidx
