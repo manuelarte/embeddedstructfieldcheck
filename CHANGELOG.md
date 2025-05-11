@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Renaming project to `embeddedstructfieldcheck`.
+- Supporting `suggestedfix` for missing space between embedded types and not embedded types.
 
 ## [v0.1.0] 2025-04-24
 

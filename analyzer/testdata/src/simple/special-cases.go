@@ -18,3 +18,17 @@ type DeclaredSameLineEmbeddedLast struct {
 	lat, long int
 	time.Time // want `embedded types should be listed before non embedded types`
 }
+
+type Foo struct {
+	Name string
+}
+
+type Bar struct {
+	Value int
+}
+
+type MultipleEmbeddedTypes struct {
+	Foo
+	Bar  // want `there must be an empty line separating embedded fields from regular fields`
+	Data []string
+}

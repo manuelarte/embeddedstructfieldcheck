@@ -1,13 +1,10 @@
-package structanalyzer
+package internal
 
 import (
 	"go/ast"
 	"go/token"
 
 	"golang.org/x/tools/go/analysis"
-
-	"github.com/manuelarte/embeddedstructfieldcheck/internal/astutils"
-	"github.com/manuelarte/embeddedstructfieldcheck/internal/diag"
 )
 
 type StructAnalyzer struct {
@@ -30,20 +27,25 @@ func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 	if !s.IsAnalyzingStruct() {
 		return analysis.Diagnostic{}, false
 	}
+
 	var firstEmbeddedField *ast.Field
+
 	var lastEmbeddedField *ast.Field
+
 	var firstNotEmbeddedField *ast.Field
 
 	for _, field := range s.st.Fields.List {
-		if astutils.IsFieldEmbedded(field) {
+		if IsFieldEmbedded(field) {
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
 			}
+
 			if lastEmbeddedField == nil || lastEmbeddedField.Pos() < field.Pos() {
 				lastEmbeddedField = field
 			}
+
 			if firstNotEmbeddedField != nil && firstNotEmbeddedField.Pos() < field.Pos() {
-				return diag.NewEmbeddedTypeAfterNotEmbeddedTypeDiag(field), true
+				return NewEmbeddedTypeAfterNotEmbeddedTypeDiag(field), true
 			}
 		} else if firstNotEmbeddedField == nil {
 			firstNotEmbeddedField = field
@@ -55,6 +57,7 @@ func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 			return d, true
 		}
 	}
+
 	return analysis.Diagnostic{}, false
 }
 
@@ -83,8 +86,10 @@ func (s *StructAnalyzer) checkMissingSpace(
 	if cg, ok := s.cg[nextLine-1]; ok {
 		nextLine = s.fset.Position(cg.Pos()).Line
 	}
+
 	if nextLine != line+2 {
-		return diag.NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField), true
+		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField), true
 	}
+
 	return analysis.Diagnostic{}, false
 }

@@ -7,7 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 
-	"github.com/manuelarte/embeddedstructfieldcheck/internal/structanalyzer"
+	"github.com/manuelarte/embeddedstructfieldcheck/internal"
 )
 
 func NewAnalyzer() *analysis.Analyzer {
@@ -40,14 +40,16 @@ func (l embeddedstructfieldcheck) run(pass *analysis.Pass) (any, error) {
 		(*ast.CommentGroup)(nil),
 	}
 
-	var a structanalyzer.StructAnalyzer
+	var a internal.StructAnalyzer
+
 	insp.Preorder(nodeFilter, func(n ast.Node) {
 		switch node := n.(type) {
 		case *ast.StructType:
 			if diag, ok := a.Analyze(); ok {
 				pass.Report(diag)
 			}
-			a = structanalyzer.New(fset, node)
+
+			a = internal.New(fset, node)
 		case *ast.CommentGroup:
 			if a.IsAnalyzingStruct() && node.End() <= a.GetEndPos() {
 				a.CheckCommentGroup(node)
