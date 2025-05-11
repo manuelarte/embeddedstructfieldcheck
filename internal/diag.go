@@ -21,6 +21,7 @@ func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(
 	if firstRegularField.Doc != nil {
 		suggestedPos = firstRegularField.Doc.Pos()
 	}
+
 	return analysis.Diagnostic{
 		Pos:     lastEmbeddedField.Pos(),
 		Message: "there must be an empty line separating embedded fields from regular fields",
