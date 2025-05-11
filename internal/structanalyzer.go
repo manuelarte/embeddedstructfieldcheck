@@ -45,7 +45,7 @@ func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 			}
 
 			if firstNotEmbeddedField != nil && firstNotEmbeddedField.Pos() < field.Pos() {
-				return NewEmbeddedTypeAfterNotEmbeddedTypeDiag(field), true
+				return NewEmbeddedTypeAfterRegularTypeDiag(field), true
 			}
 		} else if firstNotEmbeddedField == nil {
 			firstNotEmbeddedField = field
@@ -88,7 +88,7 @@ func (s *StructAnalyzer) checkMissingSpace(
 	}
 
 	if nextLine != line+2 {
-		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(lastEmbeddedField), true
+		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(lastEmbeddedField), true
 	}
 
 	return analysis.Diagnostic{}, false

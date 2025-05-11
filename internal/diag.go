@@ -6,18 +6,29 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-func NewEmbeddedTypeAfterNotEmbeddedTypeDiag(embeddedField *ast.Field) analysis.Diagnostic {
+func NewEmbeddedTypeAfterRegularTypeDiag(embeddedField *ast.Field) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos:     embeddedField.Pos(),
-		Message: "embedded types should be listed before non embedded types",
+		Message: "embedded fields should be listed before regular fields",
 	}
 }
 
-func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstNotEmbeddedTypeDiag(
+func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(
 	lastEmbeddedField *ast.Field,
 ) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos:     lastEmbeddedField.Pos(),
 		Message: "there must be an empty line separating embedded fields from regular fields",
+		SuggestedFixes: []analysis.SuggestedFix{
+			{
+				Message: "adding extra line separating embedded fields from regular fields",
+				TextEdits: []analysis.TextEdit{
+					{
+						Pos:     lastEmbeddedField.End(),
+						NewText: []byte("\n\n"),
+					},
+				},
+			},
+		},
 	}
 }
