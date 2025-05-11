@@ -1,8 +1,8 @@
-# EmbeddedCheck
+# EmbeddedStructFieldCheck
 
-[![Go](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/embeddedcheck/actions/workflows/go.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/manuelarte/embeddedcheck)](https://goreportcard.com/report/github.com/manuelarte/embeddedcheck)
-![version](https://img.shields.io/github/v/release/manuelarte/embeddedcheck)
+[![Go](https://github.com/manuelarte/embeddedstructfieldcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/embeddedstructfieldcheck/actions/workflows/go.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/manuelarte/embeddedstructfieldcheck)](https://goreportcard.com/report/github.com/manuelarte/embeddedstructfieldcheck)
+![version](https://img.shields.io/github/v/release/manuelarte/embeddedstructfieldcheck)
 
 Linter that checks that embedded types should be at the top of the field list of a struct.
 And there must be an empty line separating embedded fields from regular fields.
@@ -39,7 +39,7 @@ type Client struct {
 Install it by running:
 
 ```bash
-go install github.com/manuelarte/embeddedcheck@latest
+go install github.com/manuelarte/embeddedstructfieldcheck@latest
 ```
 
 ## Resources
