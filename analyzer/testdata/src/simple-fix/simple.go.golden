@@ -12,9 +12,8 @@ type ValidStruct struct {
 }
 
 type NoSpaceStruct struct {
-	time.Time
+	time.Time // want `there must be an empty line separating embedded fields from regular fields`
 
-    // want `there must be an empty line separating embedded fields from regular fields`
 	version   int
 }
 
@@ -35,9 +34,8 @@ type MixedEmbeddedAndNotEmbedded struct {
 }
 
 type EmbeddedWithPointers struct {
-	*time.Time
+	*time.Time // want `there must be an empty line separating embedded fields from regular fields`
 
-    // want `there must be an empty line separating embedded fields from regular fields`
 	version    int
 }
 
@@ -50,8 +48,7 @@ type ValidStructWithTags struct {
 
 type StructWithTagsNoSpace struct {
 	EmbeddedWithPointers        `json:"foo"`
-	MixedEmbeddedAndNotEmbedded `json:"bar"`
+	MixedEmbeddedAndNotEmbedded `json:"bar"` // want `there must be an empty line separating embedded fields from regular fields`
 
-    // want `there must be an empty line separating embedded fields from regular fields`
 	D string
 }

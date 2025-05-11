@@ -10,9 +10,8 @@ func myFunction() {
 }
 
 type DeclaredSameLineNoSpace struct {
-	time.Time
+	time.Time // want `there must be an empty line separating embedded fields from regular fields`
 
-    // want `there must be an empty line separating embedded fields from regular fields`
 	lat, long int
 }
 
@@ -31,8 +30,7 @@ type Bar struct {
 
 type MultipleEmbeddedTypes struct {
 	Foo
-	Bar
+	Bar // want `there must be an empty line separating embedded fields from regular fields`
 
-	// want `there must be an empty line separating embedded fields from regular fields`
 	Data []string
 }

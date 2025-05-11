@@ -15,7 +15,12 @@ func NewEmbeddedTypeAfterRegularTypeDiag(embeddedField *ast.Field) analysis.Diag
 
 func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(
 	lastEmbeddedField *ast.Field,
+	firstRegularField *ast.Field,
 ) analysis.Diagnostic {
+	suggestedPos := firstRegularField.Pos()
+	if firstRegularField.Doc != nil {
+		suggestedPos = firstRegularField.Doc.Pos()
+	}
 	return analysis.Diagnostic{
 		Pos:     lastEmbeddedField.Pos(),
 		Message: "there must be an empty line separating embedded fields from regular fields",
@@ -24,7 +29,7 @@ func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(
 				Message: "adding extra line separating embedded fields from regular fields",
 				TextEdits: []analysis.TextEdit{
 					{
-						Pos:     lastEmbeddedField.End(),
+						Pos:     suggestedPos,
 						NewText: []byte("\n\n"),
 					},
 				},

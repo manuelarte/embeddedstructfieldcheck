@@ -76,19 +76,19 @@ func (s *StructAnalyzer) GetEndPos() token.Pos {
 
 func (s *StructAnalyzer) checkMissingSpace(
 	lastEmbeddedField *ast.Field,
-	firstNotEmbeddedField *ast.Field,
+	firstRegularField *ast.Field,
 ) (analysis.Diagnostic, bool) {
 	// check for missing space
-	// TODO: isn't it easy to remove as many lines as comments between last embededed type and first not embedded
+	// TODO: isn't it easy to remove as many lines as comments between last embedded type and first not embedded
 	line := s.fset.Position(lastEmbeddedField.End()).Line
 
-	nextLine := s.fset.Position(firstNotEmbeddedField.Pos()).Line
+	nextLine := s.fset.Position(firstRegularField.Pos()).Line
 	if cg, ok := s.cg[nextLine-1]; ok {
 		nextLine = s.fset.Position(cg.Pos()).Line
 	}
 
 	if nextLine != line+2 {
-		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(lastEmbeddedField), true
+		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(lastEmbeddedField, firstRegularField), true
 	}
 
 	return analysis.Diagnostic{}, false
