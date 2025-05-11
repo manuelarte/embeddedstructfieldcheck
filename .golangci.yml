@@ -23,7 +23,7 @@ formatters:
 linters:
   default: all
   disable:
-    - decorder
+    - decoder # codespell:ignore decoder
     - dupl
     - err113
     - errchkjson
@@ -34,7 +34,7 @@ linters:
     - gomodguard
     - gosmopolitan
     - grouper
-    - importas
+    - imports
     - inamedparam
     - ireturn
     - maintidx
@@ -165,4 +165,3 @@ linters:
 issues:
   max-same-issues: 0
   max-issues-per-linter: 0
-
