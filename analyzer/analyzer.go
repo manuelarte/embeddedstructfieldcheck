@@ -7,14 +7,14 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 
-	"github.com/manuelarte/embeddedcheck/internal/structanalyzer"
+	"github.com/manuelarte/embeddedstructfieldcheck/internal/structanalyzer"
 )
 
 func NewAnalyzer() *analysis.Analyzer {
-	l := embeddedcheck{}
+	l := embeddedstructfieldcheck{}
 
 	a := &analysis.Analyzer{
-		Name: "embeddedcheck",
+		Name: "embeddedstructfieldcheck",
 		Doc: "Embedded types should be at the top of the field list of a struct, " +
 			"and there must be an empty line separating embedded fields from regular fields. methods, and constructors",
 		Run:      l.run,
@@ -24,9 +24,9 @@ func NewAnalyzer() *analysis.Analyzer {
 	return a
 }
 
-type embeddedcheck struct{}
+type embeddedstructfieldcheck struct{}
 
-func (l embeddedcheck) run(pass *analysis.Pass) (any, error) {
+func (l embeddedstructfieldcheck) run(pass *analysis.Pass) (any, error) {
 	fset := pass.Fset
 
 	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
