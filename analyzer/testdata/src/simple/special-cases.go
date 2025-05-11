@@ -32,3 +32,9 @@ type MultipleEmbeddedTypes struct {
 	Bar  // want `there must be an empty line separating embedded fields from regular fields`
 	Data []string
 }
+
+type FooBar struct {
+	Foo
+	Data []string
+	Bar  // want `embedded fields should be listed before regular fields`
+}
