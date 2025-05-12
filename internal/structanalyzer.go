@@ -2,39 +2,18 @@ package internal
 
 import (
 	"go/ast"
-	"go/token"
 
 	"golang.org/x/tools/go/analysis"
 )
 
-type StructAnalyzer struct {
-	fset *token.FileSet
-	st   *ast.StructType
-
-	cg map[int]*ast.CommentGroup
-}
-
-func NewStructAnalyzer(fset *token.FileSet, st *ast.StructType) StructAnalyzer {
-	return StructAnalyzer{
-		fset: fset,
-		st:   st,
-
-		cg: make(map[int]*ast.CommentGroup),
-	}
-}
-
-func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
-	if !s.IsAnalyzingStruct() {
-		return analysis.Diagnostic{}, false
-	}
-
+func Analyze(pass *analysis.Pass, st *ast.StructType) {
 	var firstEmbeddedField *ast.Field
 
 	var lastEmbeddedField *ast.Field
 
 	var firstNotEmbeddedField *ast.Field
 
-	for _, field := range s.st.Fields.List {
+	for _, field := range st.Fields.List {
 		if IsFieldEmbedded(field) {
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
@@ -45,51 +24,30 @@ func (s *StructAnalyzer) Analyze() (analysis.Diagnostic, bool) {
 			}
 
 			if firstNotEmbeddedField != nil && firstNotEmbeddedField.Pos() < field.Pos() {
-				return NewEmbeddedTypeAfterRegularTypeDiag(field), true
+				pass.Report(NewMisplacedEmbeddedFieldDiag(field))
+				return
 			}
 		} else if firstNotEmbeddedField == nil {
 			firstNotEmbeddedField = field
 		}
 	}
 
+	checkMissingSpace(pass, lastEmbeddedField, firstNotEmbeddedField)
+}
+
+func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedField *ast.Field) {
 	if lastEmbeddedField != nil && firstNotEmbeddedField != nil {
-		if d, ok := s.checkMissingSpace(lastEmbeddedField, firstNotEmbeddedField); ok {
-			return d, true
+		// check for missing space
+		// TODO: isn't it easy to remove as many lines as comments between last embedded type and first not embedded
+		line := pass.Fset.Position(lastEmbeddedField.End()).Line
+
+		nextLine := pass.Fset.Position(firstNotEmbeddedField.Pos()).Line
+		if firstNotEmbeddedField.Doc != nil {
+			nextLine = pass.Fset.Position(firstNotEmbeddedField.Doc.Pos()).Line
+		}
+
+		if nextLine != line+2 {
+			pass.Report(NewMissingSpaceDiag(lastEmbeddedField, firstNotEmbeddedField))
 		}
 	}
-
-	return analysis.Diagnostic{}, false
-}
-
-func (s *StructAnalyzer) CheckCommentGroup(node *ast.CommentGroup) {
-	lineEnd := s.fset.Position(node.End()).Line
-	s.cg[lineEnd] = node
-}
-
-func (s *StructAnalyzer) IsAnalyzingStruct() bool {
-	return s.st != nil
-}
-
-func (s *StructAnalyzer) GetEndPos() token.Pos {
-	return s.st.End()
-}
-
-func (s *StructAnalyzer) checkMissingSpace(
-	lastEmbeddedField *ast.Field,
-	firstRegularField *ast.Field,
-) (analysis.Diagnostic, bool) {
-	// check for missing space
-	// TODO: isn't it easy to remove as many lines as comments between last embedded type and first not embedded
-	line := s.fset.Position(lastEmbeddedField.End()).Line
-
-	nextLine := s.fset.Position(firstRegularField.Pos()).Line
-	if cg, ok := s.cg[nextLine-1]; ok {
-		nextLine = s.fset.Position(cg.Pos()).Line
-	}
-
-	if nextLine != line+2 {
-		return NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(lastEmbeddedField, firstRegularField), true
-	}
-
-	return analysis.Diagnostic{}, false
 }
