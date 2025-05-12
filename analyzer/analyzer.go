@@ -49,7 +49,7 @@ func (l embeddedstructfieldcheck) run(pass *analysis.Pass) (any, error) {
 				pass.Report(diag)
 			}
 
-			a = internal.New(fset, node)
+			a = internal.NewStructAnalyzer(fset, node)
 		case *ast.CommentGroup:
 			if a.IsAnalyzingStruct() && node.End() <= a.GetEndPos() {
 				a.CheckCommentGroup(node)

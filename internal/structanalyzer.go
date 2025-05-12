@@ -14,7 +14,7 @@ type StructAnalyzer struct {
 	cg map[int]*ast.CommentGroup
 }
 
-func New(fset *token.FileSet, st *ast.StructType) StructAnalyzer {
+func NewStructAnalyzer(fset *token.FileSet, st *ast.StructType) StructAnalyzer {
 	return StructAnalyzer{
 		fset: fset,
 		st:   st,
