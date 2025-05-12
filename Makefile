@@ -14,7 +14,7 @@ build: ## Build
 .PHONY: tidy
 
 t: test
-test: ## Run unit tests, alias: t
+test: fmt ## Run unit tests, alias: t
 	go test --cover -timeout=300s -parallel=16 ./...
 .PHONY: t test
 

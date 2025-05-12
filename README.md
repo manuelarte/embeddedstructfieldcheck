@@ -42,6 +42,14 @@ Install it by running:
 go install github.com/manuelarte/embeddedstructfieldcheck@latest
 ```
 
+And then use it as:
+
+```bash
+embeddedstructfieldcheck [--fix]
+```
+
+- `fix`: Fix the case when there is no space between the embedded fields and the regular fields.
+
 ## Resources
 
 - [Embedding in structs](https://github.com/uber-go/guide/blob/master/style.md#embedding-in-structs)

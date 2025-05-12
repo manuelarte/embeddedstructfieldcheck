@@ -12,7 +12,7 @@ func TestAnalyzer(t *testing.T) {
 		patterns string
 	}{
 		{
-			desc:     "default",
+			desc:     "simple",
 			patterns: "simple",
 		},
 		{
@@ -26,6 +26,30 @@ func TestAnalyzer(t *testing.T) {
 			a := NewAnalyzer()
 
 			analysistest.Run(t, analysistest.TestData(), a, test.patterns)
+		})
+	}
+}
+
+func TestAnalyzerWithFix(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		patterns string
+	}{
+		{
+			desc:     "simple fix",
+			patterns: "simple-fix",
+		},
+		{
+			desc:     "comments fix",
+			patterns: "comments-fix",
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.desc, func(t *testing.T) {
+			a := NewAnalyzer()
+
+			analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), a, test.patterns)
 		})
 	}
 }
