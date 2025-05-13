@@ -6,14 +6,14 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-func NewEmbeddedTypeAfterRegularTypeDiag(embeddedField *ast.Field) analysis.Diagnostic {
+func NewMisplacedEmbeddedFieldDiag(embeddedField *ast.Field) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos:     embeddedField.Pos(),
 		Message: "embedded fields should be listed before regular fields",
 	}
 }
 
-func NewMissingSpaceBetweenLastEmbeddedTypeAndFirstRegularTypeDiag(
+func NewMissingSpaceDiag(
 	lastEmbeddedField *ast.Field,
 	firstRegularField *ast.Field,
 ) analysis.Diagnostic {
