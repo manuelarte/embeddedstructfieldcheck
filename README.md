@@ -36,7 +36,20 @@ type Client struct {
 
 ## ⬇️  Getting Started
 
-Install it by running:
+### As a golangci-lint linter
+
+Enable the linter in your golangci-lint configuration file, e.g:
+
+```yaml
+linters:
+  enable:
+    - embeddedstructfieldcheck 
+    ...
+```
+
+### Standalone application
+
+Install EmbeddedStructFieldCheck by running:
 
 ```bash
 go install github.com/manuelarte/embeddedstructfieldcheck@latest
