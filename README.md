@@ -45,6 +45,12 @@ linters:
   enable:
     - embeddedstructfieldcheck 
     ...
+
+  settings:
+    embeddedstructfieldcheck:
+      # Checks that sync.Mutex is not used as embedded field.
+      # Default: false
+      forbid-mutex: true
 ```
 
 ### Standalone application
@@ -58,9 +64,10 @@ go install github.com/manuelarte/embeddedstructfieldcheck@latest
 And then use it as:
 
 ```bash
-embeddedstructfieldcheck [--fix]
+embeddedstructfieldcheck [-forbid-mutex=true|false] [--fix]
 ```
 
+- `forbid-mutex`: `true|false` (default `false`) Checks that `sync.Mutex` is not used as an embedded field.
 - `fix`: Fix the case when there is no space between the embedded fields and the regular fields.
 
 ## Resources

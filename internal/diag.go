@@ -38,3 +38,10 @@ func NewMissingSpaceDiag(
 		},
 	}
 }
+
+func NewForbidMutexDiag(mutexField *ast.Field) analysis.Diagnostic {
+	return analysis.Diagnostic{
+		Pos:     mutexField.Pos(),
+		Message: "sync.Mytex should not be embedded",
+	}
+}

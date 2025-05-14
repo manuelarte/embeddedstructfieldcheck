@@ -6,7 +6,16 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-func Analyze(pass *analysis.Pass, st *ast.StructType) {
+type StructAnalyzer struct {
+	forbidMutex bool
+}
+
+func NewStructAnalyzer(forbidMutex bool) StructAnalyzer {
+	return StructAnalyzer{forbidMutex: forbidMutex}
+}
+
+//nolint:nestif // not so complex logic
+func (a StructAnalyzer) Analyze(pass *analysis.Pass, st *ast.StructType) {
 	var firstEmbeddedField *ast.Field
 
 	var lastEmbeddedField *ast.Field
@@ -15,6 +24,10 @@ func Analyze(pass *analysis.Pass, st *ast.StructType) {
 
 	for _, field := range st.Fields.List {
 		if IsFieldEmbedded(field) {
+			if a.forbidMutex && IsFieldSyncMutex(field) {
+				pass.Report(NewForbidMutexDiag(field))
+			}
+
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
 			}

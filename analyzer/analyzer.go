@@ -10,19 +10,30 @@ import (
 	"github.com/manuelarte/embeddedstructfieldcheck/internal"
 )
 
+const ForbidMutexName = "forbid-mutex"
+
 func NewAnalyzer() *analysis.Analyzer {
+	l := embeddedstructfieldcheck{}
+
 	a := &analysis.Analyzer{
 		Name: "embeddedstructfieldcheck",
 		Doc: "Embedded types should be at the top of the field list of a struct, " +
 			"and there must be an empty line separating embedded fields from regular fields. methods, and constructors",
-		Run:      run,
+		URL:      "https://github.com/manuelarte/embeddedstructfieldcheck",
+		Run:      l.run,
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
+
+	a.Flags.BoolVar(&l.forbidMutex, ForbidMutexName, false, "Checks that sync.Mutex is not used as an embedded field.")
 
 	return a
 }
 
-func run(pass *analysis.Pass) (any, error) {
+type embeddedstructfieldcheck struct {
+	forbidMutex bool
+}
+
+func (l *embeddedstructfieldcheck) run(pass *analysis.Pass) (any, error) {
 	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !found {
 		//nolint:nilnil // impossible case.
@@ -39,7 +50,8 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		internal.Analyze(pass, node)
+		a := internal.NewStructAnalyzer(l.forbidMutex)
+		a.Analyze(pass, node)
 	})
 
 	//nolint:nilnil //any, error
