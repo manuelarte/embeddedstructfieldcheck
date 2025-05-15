@@ -41,10 +41,8 @@ func NewMissingSpaceDiag(
 }
 
 func NewForbiddenEmbeddedFieldDiag(forbidField *ast.SelectorExpr) analysis.Diagnostic {
-	m := fmt.Sprintf("%s.%s should not be embedded", forbidField.X, forbidField.Sel.Name)
-
 	return analysis.Diagnostic{
 		Pos:     forbidField.Pos(),
-		Message: m,
+		Message: fmt.Sprintf("%s.%s should not be embedded", forbidField.X, forbidField.Sel.Name),
 	}
 }

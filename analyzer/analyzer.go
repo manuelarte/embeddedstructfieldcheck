@@ -21,7 +21,10 @@ func NewAnalyzer() *analysis.Analyzer {
 			"and there must be an empty line separating embedded fields from regular fields.",
 		URL: "https://github.com/manuelarte/embeddedstructfieldcheck",
 		Run: func(pass *analysis.Pass) (any, error) {
-			return run(pass, forbidMutex)
+			run(pass, forbidMutex)
+
+			//nolint:nilnil // impossible case.
+			return nil, nil
 		},
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
@@ -31,10 +34,9 @@ func NewAnalyzer() *analysis.Analyzer {
 	return a
 }
 
-func run(pass *analysis.Pass, forbidMutex bool) (any, error) {
+func run(pass *analysis.Pass, forbidMutex bool) {
 	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !found {
-		//nolint:nilnil // impossible case.
 		return nil, nil
 	}
 
@@ -51,6 +53,5 @@ func run(pass *analysis.Pass, forbidMutex bool) (any, error) {
 		internal.Analyze(pass, node, forbidMutex)
 	})
 
-	//nolint:nilnil //any, error
 	return nil, nil
 }
