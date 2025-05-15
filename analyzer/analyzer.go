@@ -37,7 +37,7 @@ func NewAnalyzer() *analysis.Analyzer {
 func run(pass *analysis.Pass, forbidMutex bool) {
 	insp, found := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !found {
-		return nil, nil
+		return
 	}
 
 	nodeFilter := []ast.Node{
@@ -52,6 +52,4 @@ func run(pass *analysis.Pass, forbidMutex bool) {
 
 		internal.Analyze(pass, node, forbidMutex)
 	})
-
-	return nil, nil
 }
