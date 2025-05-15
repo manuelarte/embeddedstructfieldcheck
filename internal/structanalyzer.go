@@ -42,8 +42,14 @@ func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMu
 		return
 	}
 
-	if se, ok := getFieldSyncMutex(field); ok {
-		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
+	switch e := field.Type.(type) {
+	case *ast.StarExpr:
+		if se, isSelectorExpr := e.X.(*ast.SelectorExpr); isSelectorExpr {
+			reportSyncMutex(pass, se)
+		}
+
+	case *ast.SelectorExpr:
+		reportSyncMutex(pass, e)
 	}
 }
 
@@ -68,26 +74,13 @@ func isFieldEmbedded(field *ast.Field) bool {
 	return len(field.Names) == 0
 }
 
-func getFieldSyncMutex(field *ast.Field) (*ast.SelectorExpr, bool) {
-	if p, ok := field.Type.(*ast.StarExpr); ok {
-		if se, isSelectorExpr := p.X.(*ast.SelectorExpr); isSelectorExpr {
-			return se, isSyncMutex(se)
-		}
-
-		return nil, false
+func reportSyncMutex(pass *analysis.Pass, se *ast.SelectorExpr) {
+	packageName, isIdent := se.X.(*ast.Ident)
+	if !isIdent {
+		return
 	}
 
-	if se, ok := field.Type.(*ast.SelectorExpr); ok {
-		return se, isSyncMutex(se)
+	if packageName.Name == "sync" && (se.Sel.Name == "Mutex" || se.Sel.Name == "RWMutex") {
+		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
 	}
-
-	return nil, false
-}
-
-func isSyncMutex(se *ast.SelectorExpr) bool {
-	if packageName, isIdent := se.X.(*ast.Ident); isIdent && packageName.Name == "sync" {
-		return se.Sel.Name == "Mutex" || se.Sel.Name == "RWMutex"
-	}
-
-	return false
 }
