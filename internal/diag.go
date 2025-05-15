@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -36,5 +37,12 @@ func NewMissingSpaceDiag(
 				},
 			},
 		},
+	}
+}
+
+func NewForbiddenEmbeddedFieldDiag(forbidField *ast.SelectorExpr) analysis.Diagnostic {
+	return analysis.Diagnostic{
+		Pos:     forbidField.Pos(),
+		Message: fmt.Sprintf("%s.%s should not be embedded", forbidField.X, forbidField.Sel.Name),
 	}
 }

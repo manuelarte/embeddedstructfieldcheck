@@ -2,6 +2,7 @@ package simple
 
 import (
 	"context"
+	"sync"
 	"time"
 )
 
@@ -48,4 +49,8 @@ type StructWithTagsNoSpace struct {
 	EmbeddedWithPointers        `json:"foo"`
 	MixedEmbeddedAndNotEmbedded `json:"bar"` // want `there must be an empty line separating embedded fields from regular fields`
 	D                           string
+}
+
+type SyncMutexEmbedded struct {
+	sync.Mutex
 }

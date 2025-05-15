@@ -6,7 +6,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-func Analyze(pass *analysis.Pass, st *ast.StructType) {
+func Analyze(pass *analysis.Pass, st *ast.StructType, forbidMutex bool) {
 	var firstEmbeddedField *ast.Field
 
 	var lastEmbeddedField *ast.Field
@@ -14,7 +14,9 @@ func Analyze(pass *analysis.Pass, st *ast.StructType) {
 	var firstNotEmbeddedField *ast.Field
 
 	for _, field := range st.Fields.List {
-		if IsFieldEmbedded(field) {
+		if isFieldEmbedded(field) {
+			checkForbiddenEmbeddedField(pass, field, forbidMutex)
+
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
 			}
@@ -35,6 +37,22 @@ func Analyze(pass *analysis.Pass, st *ast.StructType) {
 	checkMissingSpace(pass, lastEmbeddedField, firstNotEmbeddedField)
 }
 
+func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMutex bool) {
+	if !forbidMutex {
+		return
+	}
+
+	switch e := field.Type.(type) {
+	case *ast.StarExpr:
+		if se, isSelectorExpr := e.X.(*ast.SelectorExpr); isSelectorExpr {
+			reportSyncMutex(pass, se)
+		}
+
+	case *ast.SelectorExpr:
+		reportSyncMutex(pass, e)
+	}
+}
+
 func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedField *ast.Field) {
 	if lastEmbeddedField != nil && firstNotEmbeddedField != nil {
 		// check for missing space
@@ -49,5 +67,20 @@ func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedF
 		if nextLine != line+2 {
 			pass.Report(NewMissingSpaceDiag(lastEmbeddedField, firstNotEmbeddedField))
 		}
+	}
+}
+
+func isFieldEmbedded(field *ast.Field) bool {
+	return len(field.Names) == 0
+}
+
+func reportSyncMutex(pass *analysis.Pass, se *ast.SelectorExpr) {
+	packageName, isIdent := se.X.(*ast.Ident)
+	if !isIdent {
+		return
+	}
+
+	if packageName.Name == "sync" && (se.Sel.Name == "Mutex" || se.Sel.Name == "RWMutex") {
+		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
 	}
 }
