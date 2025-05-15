@@ -14,7 +14,7 @@ func Analyze(pass *analysis.Pass, st *ast.StructType, forbidMutex bool) {
 	var firstNotEmbeddedField *ast.Field
 
 	for _, field := range st.Fields.List {
-		if IsFieldEmbedded(field) {
+		if isFieldEmbedded(field) {
 			checkForbiddenEmbeddedField(pass, field, forbidMutex)
 
 			if firstEmbeddedField == nil {
@@ -38,11 +38,11 @@ func Analyze(pass *analysis.Pass, st *ast.StructType, forbidMutex bool) {
 }
 
 func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMutex bool) {
-	if forbidMutex {
+	if !forbidMutex {
 		return
 	}
 
-	if se, ok := GetFieldSyncMutex(field); ok {
+	if se, ok := getFieldSyncMutex(field); ok {
 		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
 	}
 }
@@ -62,4 +62,32 @@ func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedF
 			pass.Report(NewMissingSpaceDiag(lastEmbeddedField, firstNotEmbeddedField))
 		}
 	}
+}
+
+func isFieldEmbedded(field *ast.Field) bool {
+	return len(field.Names) == 0
+}
+
+func getFieldSyncMutex(field *ast.Field) (*ast.SelectorExpr, bool) {
+	if p, ok := field.Type.(*ast.StarExpr); ok {
+		if se, isSelectorExpr := p.X.(*ast.SelectorExpr); isSelectorExpr {
+			return se, isSyncMutex(se)
+		}
+
+		return nil, false
+	}
+
+	if se, ok := field.Type.(*ast.SelectorExpr); ok {
+		return se, isSyncMutex(se)
+	}
+
+	return nil, false
+}
+
+func isSyncMutex(se *ast.SelectorExpr) bool {
+	if packageName, isIdent := se.X.(*ast.Ident); isIdent && packageName.Name == "sync" {
+		return se.Sel.Name == "Mutex" || se.Sel.Name == "RWMutex"
+	}
+
+	return false
 }
