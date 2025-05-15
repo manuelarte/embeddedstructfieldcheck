@@ -6,16 +6,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-type StructAnalyzer struct {
-	forbidMutex bool
-}
-
-func NewStructAnalyzer(forbidMutex bool) StructAnalyzer {
-	return StructAnalyzer{forbidMutex: forbidMutex}
-}
-
-//nolint:nestif // not so complex logic
-func (a StructAnalyzer) Analyze(pass *analysis.Pass, st *ast.StructType) {
+func Analyze(pass *analysis.Pass, st *ast.StructType, forbidMutex bool) {
 	var firstEmbeddedField *ast.Field
 
 	var lastEmbeddedField *ast.Field
@@ -24,9 +15,7 @@ func (a StructAnalyzer) Analyze(pass *analysis.Pass, st *ast.StructType) {
 
 	for _, field := range st.Fields.List {
 		if IsFieldEmbedded(field) {
-			if a.forbidMutex && IsFieldSyncMutex(field) {
-				pass.Report(NewForbidMutexDiag(field))
-			}
+			checkForbiddenEmbeddedField(pass, field, forbidMutex)
 
 			if firstEmbeddedField == nil {
 				firstEmbeddedField = field
@@ -46,6 +35,14 @@ func (a StructAnalyzer) Analyze(pass *analysis.Pass, st *ast.StructType) {
 	}
 
 	checkMissingSpace(pass, lastEmbeddedField, firstNotEmbeddedField)
+}
+
+func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMutex bool) {
+	if forbidMutex {
+		if se, ok := GetFieldSyncMutex(field); ok {
+			pass.Report(NewForbiddenEmbeddedFieldDiag(se))
+		}
+	}
 }
 
 func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedField *ast.Field) {

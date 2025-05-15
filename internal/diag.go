@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"go/ast"
 
 	"golang.org/x/tools/go/analysis"
@@ -39,9 +40,11 @@ func NewMissingSpaceDiag(
 	}
 }
 
-func NewForbidMutexDiag(mutexField *ast.Field) analysis.Diagnostic {
+func NewForbiddenEmbeddedFieldDiag(forbidField *ast.SelectorExpr) analysis.Diagnostic {
+	m := fmt.Sprintf("%s.%s should not be embedded", forbidField.X, forbidField.Sel.Name)
+
 	return analysis.Diagnostic{
-		Pos:     mutexField.Pos(),
-		Message: "sync.Mytex should not be embedded",
+		Pos:     forbidField.Pos(),
+		Message: m,
 	}
 }

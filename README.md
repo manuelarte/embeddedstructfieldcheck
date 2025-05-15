@@ -68,7 +68,7 @@ embeddedstructfieldcheck [-forbid-mutex] [--fix]
 ```
 
 - `forbid-mutex`: `true|false` (default `false`)
-   Checks that `sync.Mutex` is not used as an embedded field.
+   Checks that `sync.Mutex` and `sync.RWMutex` are not used as embedded fields.
 - `fix`: `true|false` (default `false`)
    Fix the case when there is no space between the embedded fields and the regular fields.
 

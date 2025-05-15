@@ -50,8 +50,7 @@ func (l *embeddedstructfieldcheck) run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		a := internal.NewStructAnalyzer(l.forbidMutex)
-		a.Analyze(pass, node)
+		internal.Analyze(pass, node, l.forbidMutex)
 	})
 
 	//nolint:nilnil //any, error
