@@ -18,7 +18,7 @@ func NewAnalyzer() *analysis.Analyzer {
 	a := &analysis.Analyzer{
 		Name: "embeddedstructfieldcheck",
 		Doc: "Embedded types should be at the top of the field list of a struct, " +
-			"and there must be an empty line separating embedded fields from regular fields. methods, and constructors",
+			"and there must be an empty line separating embedded fields from regular fields.",
 		URL: "https://github.com/manuelarte/embeddedstructfieldcheck",
 		Run: func(pass *analysis.Pass) (any, error) {
 			return run(pass, forbidMutex)
