@@ -29,7 +29,8 @@ func NewAnalyzer() *analysis.Analyzer {
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 
-	a.Flags.BoolVar(&forbidMutex, ForbidMutexName, false, "Checks that sync.Mutex is not used as an embedded field.")
+	a.Flags.BoolVar(&forbidMutex, ForbidMutexName, false,
+		"Checks that sync.Mutex and sync.RWMutex are not used as an embedded fields.")
 
 	return a
 }
