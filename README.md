@@ -48,7 +48,7 @@ linters:
 
   settings:
     embeddedstructfieldcheck:
-      # Checks that sync.Mutex is not used as embedded field.
+      # Checks that sync.Mutex and sync.RWMutex are not used as embedded fields.
       # Default: false
       forbid-mutex: true
 ```
