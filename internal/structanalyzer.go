@@ -39,9 +39,11 @@ func Analyze(pass *analysis.Pass, st *ast.StructType, forbidMutex bool) {
 
 func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMutex bool) {
 	if forbidMutex {
-		if se, ok := GetFieldSyncMutex(field); ok {
-			pass.Report(NewForbiddenEmbeddedFieldDiag(se))
-		}
+		return
+	}
+
+	if se, ok := GetFieldSyncMutex(field); ok {
+		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
 	}
 }
 

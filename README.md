@@ -72,10 +72,11 @@ embeddedstructfieldcheck [-forbid-mutex] [--fix]
 - `fix`: `true|false` (default `false`)
    Fix the case when there is no space between the embedded fields and the regular fields.
 
-## Why not using `sync.Mutex` as embedded field
+## Why not using `sync` mutex as embedded field
 
-You should not expose your internal synchronization to the callers.
-By embedding `sync.Mutex` you're exposing `Lock` and `Unlock` methods when you should not.
+You are granting access to your internal synchronization methods out of your struct.
+
+This should not be delegated out to the callers. It's a source of bugs.
 
 As an example:
 
