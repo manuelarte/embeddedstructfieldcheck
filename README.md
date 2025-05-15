@@ -64,11 +64,13 @@ go install github.com/manuelarte/embeddedstructfieldcheck@latest
 And then use it as:
 
 ```bash
-embeddedstructfieldcheck [-forbid-mutex=true|false] [--fix]
+embeddedstructfieldcheck [-forbid-mutex] [--fix]
 ```
 
-- `forbid-mutex`: `true|false` (default `false`) Checks that `sync.Mutex` is not used as an embedded field.
-- `fix`: Fix the case when there is no space between the embedded fields and the regular fields.
+- `forbid-mutex`: `true|false` (default `false`)
+   Checks that `sync.Mutex` is not used as an embedded field.
+- `fix`: `true|false` (default `false`)
+   Fix the case when there is no space between the embedded fields and the regular fields.
 
 ## Resources
 
