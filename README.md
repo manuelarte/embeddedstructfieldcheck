@@ -72,6 +72,56 @@ embeddedstructfieldcheck [-forbid-mutex] [--fix]
 - `fix`: `true|false` (default `false`)
    Fix the case when there is no space between the embedded fields and the regular fields.
 
+## Why not using `sync.Mutex` as embedded field
+
+You should not expose your internal synchronization to the callers.
+By embedding `sync.Mutex` you're exposing `Lock` and `Unlock` methods when you should not.
+
+As an example:
+
+<table>
+<thead><tr><th>❌ Bad</th><th>✅ Good</th></tr></thead>
+<tbody>
+<tr><td>
+
+```go
+type ViewCount struct {
+  sync.Mutex
+  
+  N int
+}
+
+v := ViewCount{}
+v.Lock()
+v.N++
+v.Unlock()
+```
+
+</td><td>
+
+```go
+type ViewCount struct {
+  mu sync.Mutex
+
+  n int
+}
+
+func (v *ViewCount) Increment() {
+  v.mu.Lock()
+  defer v.mu.Unlock()
+  
+  v.n++
+}
+
+v := ViewCount{}
+v.Increment()
+```
+
+</td></tr>
+
+</tbody>
+</table>
+
 ## Resources
 
 - [Embedding in structs](https://github.com/uber-go/guide/blob/master/style.md#embedding-in-structs)
