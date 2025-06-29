@@ -40,7 +40,8 @@ func TestAnalyzer(t *testing.T) {
 			a := NewAnalyzer()
 
 			for k, v := range test.options {
-				if err := a.Flags.Set(k, v); err != nil {
+				err := a.Flags.Set(k, v)
+				if err != nil {
 					t.Fatal(err)
 				}
 			}

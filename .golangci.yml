@@ -51,6 +51,7 @@ linters:
     - thelper
     - varnamelen
     - wrapcheck
+    - wsl  # Deprecated, use wsl_v5
     - zerologlint
 
   settings:
