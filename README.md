@@ -48,6 +48,9 @@ linters:
 
   settings:
     embeddedstructfieldcheck:
+      # Checks that there is an empty space between the embedded fields and regular fields.
+      # Default: true
+      empty-line: false
       # Checks that sync.Mutex and sync.RWMutex are not used as embedded fields.
       # Default: false
       forbid-mutex: true
@@ -64,9 +67,11 @@ go install github.com/manuelarte/embeddedstructfieldcheck@latest
 And then use it as:
 
 ```bash
-embeddedstructfieldcheck [-forbid-mutex] [--fix]
+embeddedstructfieldcheck [-empty-line] [-forbid-mutex] [--fix]
 ```
 
+- `empty-line`: `true|false` (default `true)`
+   Checks that there is an empty space between the embedded fields and regular fields.
 - `forbid-mutex`: `true|false` (default `false`)
    Checks that `sync.Mutex` and `sync.RWMutex` are not used as embedded fields.
 - `fix`: `true|false` (default `false`)

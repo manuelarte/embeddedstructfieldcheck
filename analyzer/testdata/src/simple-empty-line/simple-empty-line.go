@@ -1,0 +1,56 @@
+package simple
+
+import (
+	"context"
+	"sync"
+	"time"
+)
+
+type ValidStruct struct {
+	time.Time
+
+	version int
+}
+
+type NoSpaceStruct struct {
+	time.Time
+	version int
+}
+
+type NotSortedStruct struct {
+	version int
+
+	time.Time // want `embedded fields should be listed before regular fields`
+}
+
+type MixedEmbeddedAndNotEmbedded struct {
+	context.Context
+
+	name string
+
+	time.Time
+
+	age int
+}
+
+type EmbeddedWithPointers struct {
+	*time.Time
+	version int
+}
+
+type ValidStructWithTags struct {
+	EmbeddedWithPointers        `json:"foo"`
+	MixedEmbeddedAndNotEmbedded `json:"bar"`
+
+	D string
+}
+
+type StructWithTagsNoSpace struct {
+	EmbeddedWithPointers        `json:"foo"`
+	MixedEmbeddedAndNotEmbedded `json:"bar"`
+	D                           string
+}
+
+type SyncMutexEmbedded struct {
+	sync.Mutex
+}
