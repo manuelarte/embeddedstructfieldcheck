@@ -100,6 +100,14 @@ func TestAnalyzerWithFix(t *testing.T) {
 				ForbidMutexCheck: "false",
 			},
 		},
+		{
+			desc:     "block comments (disabling empty-line)",
+			patterns: "block-comments",
+			options: map[string]string{
+				EmptyLineCheck:   "false",
+				ForbidMutexCheck: "false",
+			},
+		},
 	}
 
 	for _, test := range testCases {
