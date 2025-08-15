@@ -1,7 +1,6 @@
 package simple
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -34,8 +33,4 @@ type A struct {
 	// C is foo
 	StructWithSingleLineComments
 	D string
-}
-
-func _() {
-	fmt.Println("FOO")
 }
