@@ -1,12 +1,15 @@
 package simple
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type ValidStructWithSingleLineComments struct {
 	// time.Time Single line comment
 	time.Time
 
-    // version Single line comment
+	// version Single line comment
 	version int
 }
 
@@ -28,7 +31,11 @@ type StructWithMultiLineComments struct {
 type A struct {
 	// comment
 	ValidStructWithSingleLineComments
-    // C is foo
+	// C is foo
 	StructWithSingleLineComments
 	D string
+}
+
+func _() {
+	fmt.Println("FOO")
 }
