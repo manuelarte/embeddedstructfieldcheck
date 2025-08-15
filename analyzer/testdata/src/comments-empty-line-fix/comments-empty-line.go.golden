@@ -2,6 +2,8 @@ package simple
 
 import "time"
 
+// Adding a comment to test git diff
+
 type ValidStructWithSingleLineComments struct {
 	// time.Time Single line comment
 	time.Time
