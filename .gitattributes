@@ -1,2 +1,2 @@
 * text=auto eol=lf
-*.go.golden -text diff=golang
+*.go.golden linguist-language=golang
