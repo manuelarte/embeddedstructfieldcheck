@@ -10,7 +10,8 @@
 
 ### Did you document any new/modified functionality?
 
-- [ ] Updated `testdata/`
-- [ ] Updated `README.md`
+- [ ] Updated `testdata/`.
+- [ ] Updated `README.md`.
+- [ ] Documented new cli option (if applicable).
 
 ### Notes
