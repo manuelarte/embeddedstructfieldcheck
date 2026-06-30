@@ -6,7 +6,12 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-func Analyze(pass *analysis.Pass, st *ast.StructType, emptyLine, forbidMutex bool) {
+func Analyze(
+	pass *analysis.Pass,
+	st *ast.StructType,
+	emptyLine, forbidMutex bool,
+	separatedComments []*ast.CommentGroup,
+) {
 	var firstEmbeddedField *ast.Field
 
 	var lastEmbeddedField *ast.Field
@@ -35,7 +40,7 @@ func Analyze(pass *analysis.Pass, st *ast.StructType, emptyLine, forbidMutex boo
 	}
 
 	if emptyLine {
-		checkMissingSpace(pass, lastEmbeddedField, firstNotEmbeddedField)
+		checkMissingSpace(pass, lastEmbeddedField, firstNotEmbeddedField, separatedComments)
 	}
 }
 
@@ -55,8 +60,20 @@ func checkForbiddenEmbeddedField(pass *analysis.Pass, field *ast.Field, forbidMu
 	}
 }
 
-func checkMissingSpace(pass *analysis.Pass, lastEmbeddedField, firstNotEmbeddedField *ast.Field) {
+func checkMissingSpace(
+	pass *analysis.Pass,
+	lastEmbeddedField, firstNotEmbeddedField *ast.Field,
+	separatedComments []*ast.CommentGroup,
+) {
 	if lastEmbeddedField != nil && firstNotEmbeddedField != nil {
+		commentInBetween := findCommentInBetweenNotBelongingToAField(
+			pass, lastEmbeddedField, firstNotEmbeddedField, separatedComments,
+		)
+		if commentInBetween != nil {
+			// do not check if there is a comment in between not assigned to any field
+			return
+		}
+
 		// check for missing space
 		// TODO: isn't it easy to remove as many lines as comments between last embedded type and first not embedded
 		line := pass.Fset.Position(lastEmbeddedField.End()).Line
@@ -85,4 +102,25 @@ func reportSyncMutex(pass *analysis.Pass, se *ast.SelectorExpr) {
 	if packageName.Name == "sync" && (se.Sel.Name == "Mutex" || se.Sel.Name == "RWMutex") {
 		pass.Report(NewForbiddenEmbeddedFieldDiag(se))
 	}
+}
+
+func findCommentInBetweenNotBelongingToAField(
+	pass *analysis.Pass,
+	lastEmbeddedField, firstNotEmbeddedField *ast.Field,
+	separatedComments []*ast.CommentGroup,
+) *ast.CommentGroup {
+	for _, cg := range separatedComments {
+		if cg.Pos() <= lastEmbeddedField.Pos() || cg.End() >= firstNotEmbeddedField.Pos() {
+			continue
+		}
+
+		// not inlined comment
+		if pass.Fset.Position(cg.Pos()).Line == pass.Fset.Position(lastEmbeddedField.Pos()).Line {
+			continue
+		}
+
+		return cg
+	}
+
+	return nil
 }

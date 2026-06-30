@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"go/ast"
+	"slices"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -50,15 +51,43 @@ func run(pass *analysis.Pass, emptyLine, forbidMutex bool) {
 	}
 
 	nodeFilter := []ast.Node{
-		(*ast.StructType)(nil),
+		new(ast.File),
+		new(ast.StructType),
 	}
 
-	insp.Preorder(nodeFilter, func(n ast.Node) {
-		node, ok := n.(*ast.StructType)
-		if !ok {
-			return
-		}
+	var fileComments []*ast.CommentGroup
 
-		internal.Analyze(pass, node, emptyLine, forbidMutex)
+	insp.Preorder(nodeFilter, func(n ast.Node) {
+		switch n := n.(type) {
+		case *ast.File:
+			fileComments = n.Comments
+		case *ast.StructType:
+			fieldComments := make([]*ast.CommentGroup, 0, len(getFields(n.Fields)))
+			for _, field := range getFields(n.Fields) {
+				if field.Doc == nil {
+					continue
+				}
+
+				fieldComments = append(fieldComments, field.Doc)
+			}
+
+			insideStructNotAttachedComments := make([]*ast.CommentGroup, 0)
+
+			for _, cg := range fileComments {
+				if cg.Pos() > n.Pos() && cg.End() < n.End() && !slices.Contains(fieldComments, cg) {
+					insideStructNotAttachedComments = append(insideStructNotAttachedComments, cg)
+				}
+			}
+
+			internal.Analyze(pass, n, emptyLine, forbidMutex, insideStructNotAttachedComments)
+		}
 	})
+}
+
+func getFields(fl *ast.FieldList) []*ast.Field {
+	if fl == nil {
+		return nil
+	}
+
+	return fl.List
 }
