@@ -104,7 +104,7 @@ func TestAnalyzerWithFix(t *testing.T) {
 			desc:     "block comments (disabling empty-line)",
 			patterns: "block-comments",
 			options: map[string]string{
-				EmptyLineCheck:   "false",
+				EmptyLineCheck:   "true",
 				ForbidMutexCheck: "false",
 			},
 		},
