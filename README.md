@@ -1,7 +1,6 @@
 # EmbeddedStructFieldCheck
 
 [![Go](https://github.com/manuelarte/embeddedstructfieldcheck/actions/workflows/go.yml/badge.svg)](https://github.com/manuelarte/embeddedstructfieldcheck/actions/workflows/go.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/manuelarte/embeddedstructfieldcheck)](https://goreportcard.com/report/github.com/manuelarte/embeddedstructfieldcheck)
 ![version](https://img.shields.io/github/v/release/manuelarte/embeddedstructfieldcheck)
 
 Linter that checks that embedded types should be at the top of the field list of a struct.
