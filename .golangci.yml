@@ -13,7 +13,9 @@ formatters:
         - pattern: 'interface{}'
           replacement: 'any'
     gofumpt:
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
     gci:
       sections:
         - standard
@@ -27,7 +29,8 @@ linters:
     - dupl
     - err113
     - errchkjson
-    - exhaustruct
+    - exhaustruct # If applicable, to be checked in code reviews.
+    - exhaustruct_v5  # If applicable, to be checked in code reviews.
     - forcetypeassert
     - ginkgolinter # Related to Ginkgo.
     - goheader
